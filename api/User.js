@@ -72,7 +72,7 @@ router.post("/signup", (req, res) => {
       status: "FAILED",
       message: "Invalid email entered",
     });
-  } else if (!/^[a-zA-Z\s]*$/.test(Name)) {
+  } else if (!/^[a-zA-Z\s]*$/.test(lastName)) {
     res.json({
       status: "FAILED",
       message: "Invalid last name",
