@@ -141,7 +141,7 @@ const sendVerificationEmail = ({ _id, email }, res) => {
 console.log("verification mail sent")
 //url to be used in the email
 
-  const currentUrl = "http://localhost:5050/";
+  const currentUrl = "https://signin-auth-zund.onrender.com";
 
   const uniqueString = uuidv4() + _id;
 
