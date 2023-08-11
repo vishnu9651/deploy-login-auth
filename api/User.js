@@ -27,6 +27,8 @@ const bcrypt = require("bcrypt");
 const path = require("path");
 // const { rmSync } = require("fs");
 
+const jwt=require("jsonwebtoken")
+
 //nodemailer stuff
 let transporter = nodemailer.createTransport({
   service: "gmail",
@@ -49,31 +51,31 @@ transporter.verify((error, success) => {
 router.post("/signup", (req, res) => {
   console.log("signup")
   
-  let { name, email, password, dateOfBirth } = req.body;
-  name = name.trim();
+  let { firstName, email, password, lastName } = req.body;
+  firstName = firstName.trim();
   email = email.trim();
   password = password.trim();
-  dateOfBirth = dateOfBirth.trim();
+  lastName = lastName.trim();
 
-  if (name == "" || email == "" || password == "" || dateOfBirth == "") {
+  if (firstName == "" || email == "" || password == "") {
     res.json({
       status: "FAILED",
       message: "Empty input fields!",
     });
-  } else if (!/^[a-zA-Z\s]*$/.test(name)) {
+  } else if (!/^[a-zA-Z\s]*$/.test(firstName)) {
     res.json({
       status: "FAILED",
-      message: "Invalid name entered",
+      message: "Invalid firstName entered",
     });
   } else if (!/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(email)) {
     res.json({
       status: "FAILED",
       message: "Invalid email entered",
     });
-  } else if (!new Date(dateOfBirth).getTime()) {
+  } else if (!/^[a-zA-Z\s]*$/.test(Name)) {
     res.json({
       status: "FAILED",
-      message: "Invalid date of birth entered",
+      message: "Invalid last name",
     });
   } else if (password.length < 8) {
     res.json({
@@ -97,10 +99,10 @@ router.post("/signup", (req, res) => {
           .hash(password, saltRounds)
           .then((hashedPassword) => {
             const newUser = new User({
-              name,
+              firstName,
               email,
               password: hashedPassword,
-              dateOfBirth,
+              lastName,
               verified: false,
             });
 
@@ -139,7 +141,7 @@ const sendVerificationEmail = ({ _id, email }, res) => {
 console.log("verification mail sent")
 //url to be used in the email
 
-  const currentUrl = "http://localhost:5000/";
+  const currentUrl = "http://localhost:5050/";
 
   const uniqueString = uuidv4() + _id;
 
@@ -148,7 +150,7 @@ console.log("verification mail sent")
     from: process.env.AUTH_EMAIL,
     to: email,
     subject: "Verify your Email",
-    html: `<p>Verify your email address to complete the Signup process and then Login into your account.</p><p>This link <b>expires in 6 hours</b>.</p> <p> Press <a href=${currentUrl + "user/verify/" + _id + "/" + uniqueString}> here</a> to proceed. </p>`,
+    html: `<p>Verify your email address to complete the Signup process and then Login into your account.</p><p>This link <b>expires in 6 hours</b>.</p> <p> Press <a href=${currentUrl + "user/verify/" + _id + "/" + uniqueString}> here</a> to proceed.</p>`,
   }
 
   //hash the uniqueString
@@ -322,8 +324,10 @@ router.post("/signin", (req, res) => {
               .then(result => {
                 if (result) {
                   //password match
+                  const token = jwt.sign({ app: "prime" }, "vishnu")
                   res.json({
                     status: "SUCCESS",
+                    token:token,
                     message: "Signin successful",
                     data: data
                   })
